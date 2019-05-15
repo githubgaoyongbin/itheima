@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="js/vue2.0.js"></script>
+    <title>聊天机器人</title>
+</head>
+
+<body>
+    <div class="wrap" v-cloak>
+        <div class="header">
+            <h3>知心姐姐</h3>
+            <img src="img/person01.png" alt="icon">
+        </div>
+        <div class="main">
+            <ul class="talk_list" id="ulBox">
+                <!-- <li v-for="item in MsgList" :class="(item.role==1)?'left_word':'right_word'">
+                    <img :src="(item.role==1)?'img/person01.png':'img/person02.png'">
+                    <span>{{ item.msg }}</span>
+                </li> -->
+            </ul>
+            <div class="drag_bar">
+                <div class="drager"></div>
+            </div>
+        </div>
+        <div class="footer">
+            <img src="img/person02.png" alt="icon">
+            <input type="text" placeholder="说的什么吧..." class="input_txt" id="iptMsg">
+            <input type="button" value="发 送" class="input_sub" id="btn">
+        </div>
+    </div>
+    <script type="text/javascript" src="js/scroll.js"></script>
+    <script>
+
+    </script>
+
+</body>
+<!-- 
+    1）打开页面时要跟机器人打招呼
+    2）输入留言，点击发送
+        2.1 将留言发送到机器人的 API 中
+        2.2 接收机器人 API 返回的数据
+ -->
+<script>
+    //封装异步对象ajax的方法
+    //@parma info:打招呼的内容
+    //       callback:回调函数作为接受响应数据的参数
+    function ajax(info, callback) {
+        //1.0 创建异步对象
+        let xhr = new XMLHttpRequest();
+        //2.0 开启连接
+        xhr.open('get', `http://www.tuling123.com/openapi/api?key=9a960a5e512749b1821d2e084a5999d4&info=${info}`)
+        //3.0 发送请求
+        xhr.send();
+        //4.0 通过xhr.onload的方法响应
+        xhr.onload = () => {
+            //接受数据
+            let result = xhr.responseText;
+            //将接受的数据转化成对象
+            let obj = JSON.parse(result);
+            console.log(obj);
+            callback(obj)
+        }
+    }
+    //获取对应的对象
+    let iptMsg = document.getElementById('iptMsg');
+    let btn = document.getElementById('btn');
+    let ulBox = document.getElementById('ulBox');
+    //一加载网页 机器人问好
+    window.onload = function () {
+        //调用异步方法
+        ajax('你好啊', obj => {
+            //拿到数据渲染页面
+            let str = '';
+            str += `<li class='left_word'>`
+            str += `<img src="img/person01.png">`
+            str += `<span>${obj.text}</span>`
+            str += `</li>`
+            //将数据添加到ul中
+            ulBox.innerHTML += str;
+        })
+    };
+    btn.onclick = function () {
+        //拿到文本框的内容
+        let txt = iptMsg.value;
+        //点击后清空文本框的内容
+        iptMsg.value = "";
+        //将获取到的内容显示在聊天框
+        let str = "";
+        str += `<li class='right_word'>`
+        str += `<img src="img/person02.png">`
+        str += `<span>${txt}</span>`
+        str += `</li>`;
+        ulBox.innerHTML += str;
+        //然后将机器人回应的数据显示在文本框 调用ajax的方法
+        ajax(txt, obj => {
+            //拿到数据渲染页面
+            let str = '';
+            str += `<li class='left_word'>`
+            str += `<img src="img/person01.png">`
+            str += `<span>${obj.text}</span>`
+            str += `</li>`
+            //将数据添加到ul中
+            ulBox.innerHTML += str;
+        })
+    }
+
+
+
+
+
+
+    // //刷新页面一加载机器人先打招呼
+    // window.onload = () => {
+    //     ajax('你好啊', obj => {
+    //         //拿到数据渲染页面
+    //         let str = '';
+    //         str += `<li class="left_word">`;
+    //         str += `<img src="img/person01.png">`;
+    //         str += `<span>${obj.text}</span>`;
+    //         str += `</li>`;
+    //         ulBox.innerHTML += str;
+    //     })
+    // };
+    // //发送按钮的点击事件
+    // btn.onclick = function () {
+    //     //拿到文本框的内容
+    //     let txt = iptMsg.value;
+    //     iptMsg.value = '';
+    //     //点击时将文本框的内容显示在聊天框
+    //     let str = '';
+    //     str += `<li class="right_word">`;
+    //     str += `<img src="img/person02.png">`;
+    //     str += `<span>${txt}</span>`;
+    //     str += `</li>`;
+    //     ulBox.innerHTML += str;
+    //     ajax(txt, obj => {
+    //         //拿到机器人回应的数据 渲染页面
+    //         let str = '';
+    //         str += `<li class="left_word">`;
+    //         str += `<img src="img/person01.png">`;
+    //         str += `<span>${obj.text}</span>`;
+    //         str += `</li>`;
+    //         ulBox.innerHTML += str;
+    //     })
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // // 封装发送异步请求的 API
+    // function ajax(info, callback) {
+    //     let xhr = new XMLHttpRequest()
+    //     xhr.open('get', `http://www.tuling123.com/openapi/api?key=9a960a5e512749b1821d2e084a5999d4&info=${info}`)
+    //     xhr.send()
+    //     xhr.onload = function () {
+    //         let result = xhr.responseText
+    //         let obj = JSON.parse(result)
+    //         callback(obj)
+    //     }
+    // }
+    // let ulBox = document.querySelector('#ulBox')
+    // // 1）
+    // window.onload = () => {
+    //     ajax('hello', obj => {
+    //         // 将机器人返回的数据显示到界面上
+    //         let str = '<li class="left_word">'
+    //         str += '<img src="img/person01.png">'
+    //         str += '<span>' + obj.text + '</span>'
+    //         str += '</li>'
+    //         ulBox.innerHTML = str
+    //     })
+    // }
+    // // 2.0 输入内容，点击发送
+    // let btn = document.querySelector('#btn')
+    // let iptMsg = document.querySelector('#iptMsg')
+    // btn.onclick = () => {
+    //     // 得到输入的内容
+    //     let info = iptMsg.value
+    //     iptMsg.value = ''
+    //     // 将输入的内容显示到界面上
+    //     let str = '<li class="right_word">'
+    //     str += '<img src="img/person02.png">'
+    //     str += '<span>' + info + '</span>'
+    //     str += '</li>'
+    //     ulBox.innerHTML += str
+    //     // 将信息提交到 机器人 API
+    //     ajax(info, obj => {
+    //         let str = '<li class="left_word">'
+    //         str += '<img src="img/person01.png">'
+    //         str += '<span>' + obj.text + '</span>'
+    //         str += '</li>'
+    //         ulBox.innerHTML += str
+    //     })
+    // }
+</script>
+
+</html>
